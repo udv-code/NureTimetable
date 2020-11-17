@@ -1,15 +1,20 @@
-﻿using Android.App;
+﻿using System;
+using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
+using AndroidX.Core.App;
+using NureTimetable.Droid.Tasks.Reminders;
 using Plugin.CurrentActivity;
 using Plugin.InAppBilling;
 using Xamarin.Forms.Platform.Android;
 
 namespace NureTimetable.Droid
 {
-    [Activity(Label = nameof(NureTimetable), Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize)]
+    [Activity(Label = nameof(NureTimetable), Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true,
+        ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode |
+                               ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize)]
     public class MainActivity : FormsAppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
@@ -23,6 +28,10 @@ namespace NureTimetable.Droid
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
             CrossCurrentActivity.Current.Init(this, savedInstanceState);
             TouchEffect.Android.TouchEffectPreserver.Preserve();
+
+            RemindersReceiver.CreateNotificationChannel(this);
+            Reminders.From(this).Schedule(DateTime.Now);
+
             LoadApplication(new App());
         }
 
@@ -32,7 +41,8 @@ namespace NureTimetable.Droid
             InAppBillingImplementation.HandleActivityResult(requestCode, resultCode, data);
         }
 
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions,
+            [GeneratedEnum] Permission[] grantResults)
         {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
